@@ -1,2 +1,2 @@
 # Intro
-This is a repository of all the rust code that I have made for the class CCS-363.
+This is a repository of all the rust code that I have made for the class CSC-363.
