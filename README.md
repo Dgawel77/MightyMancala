@@ -1,1 +1,2 @@
-# Notes
+# Intro
+This is a repository of all the rust code that I have made for the class CCS-363.
