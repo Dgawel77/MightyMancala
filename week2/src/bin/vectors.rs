@@ -16,7 +16,6 @@ fn main(){
     }
     dbg!( new_vec.len(), new_vec.capacity(), new_vec.as_ptr(), new_vec);
 
-
     for x in 0..10{
         capacity_vec.push(x as u8);
     }
