@@ -5,11 +5,11 @@ use std::io::Read;
 use std::str;
 
 fn byte_line_print(p:u64, byte_vec: [u8; 16]) -> (){
-    print!("{:08X} |   ", p);
+    print!("{:07X}0 |   ", p);
 
     for (p, b) in byte_vec.iter().enumerate(){
         if p % 8 == 0 && p != 0{
-            print!("| ");
+            print!("- ");
         }
         print!("{:02X} ", b);
     }
