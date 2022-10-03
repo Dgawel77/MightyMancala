@@ -1,4 +1,6 @@
 use clap::Parser;
+mod sub;
+mod extra_functions;
 
 #[derive(Parser)]
 struct Cli{
@@ -12,6 +14,9 @@ fn main() -> std::io::Result<()>{
     
     println!("{full_path}");
     println!("{}", std::env::current_dir()?.display());
+
+    sub::sub_function();
+    extra_functions::extra_function();
 
     let result = std::fs::read_to_string(full_path);
     match result{
