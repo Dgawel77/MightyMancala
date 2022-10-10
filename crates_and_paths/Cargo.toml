@@ -1,5 +1,5 @@
 [package]
-name = "mancala"
+name = "cartes_and_paths"
 version = "0.1.0"
 edition = "2021"
 
