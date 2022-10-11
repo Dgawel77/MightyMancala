@@ -14,3 +14,4 @@ Cargo.lock
 *.pdb
 
 CSC362.code-workspace
+.obsidian
