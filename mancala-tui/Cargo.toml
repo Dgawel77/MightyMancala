@@ -1,5 +1,5 @@
 [package]
-name = "mancala"
+name = "mancala-tui"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 cursive = {version = "0.20", default-features = false }
+rand = "0.8.5"
 
 [features]
 default = ["cursive/crossterm-backend"]

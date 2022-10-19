@@ -1,5 +1,3 @@
-mod game;
-
 #[derive(Debug)]
 enum BoardState {
     Config,
