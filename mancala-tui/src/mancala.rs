@@ -61,13 +61,41 @@ impl Mancala{
             self.game_board[(p+chosen) % BOARD_LEN] += 1;
         }
     }
+
+    // gonna have to change this later
+    pub fn has_won(&self) -> bool {
+        match self.game_setting.mode{
+            GameMode::Avalanche =>{
+                self.game_board[0..6].into_iter().all(|x| *x == 0) || self.game_board[8..13].into_iter().all(|x| *x == 0)
+            },
+            GameMode::Capture => {
+                self.game_board[0..6].into_iter().all(|x| *x == 0) || self.game_board[8..13].into_iter().all(|x| *x == 0)
+            }
+        }
+            
+    }
 }
 
 use std::fmt;
 impl fmt::Display for Mancala{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut s = String::with_capacity(180);
-        s.push_str(&format!("{:?}", self.game_board));
+        s.push_str(&format!("{:?}\n  ", self.game_board));
+        for x in (7..13).rev(){
+            s.push_str(&format!("|{:2}", x));
+        }
+        s.push_str(&format!("\n{:02}|", self.game_board[13]));
+        for x in (7..13).rev(){
+            s.push_str(&format!("{:02}|", self.game_board[x]));
+        }
+        s.push_str("\n  |");
+        for x in 0..6{
+            s.push_str(&format!("{:02}|", self.game_board[x]));
+        }
+        s.push_str(&format!("{:02}|\n  ", self.game_board[6]));
+        for x in 0..6{
+            s.push_str(&format!("|{} ", x));
+        }
         write!(f, "{}", s)
     }
 }
