@@ -79,6 +79,7 @@ impl Mancala{
 use std::fmt;
 impl fmt::Display for Mancala{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // very bad formatting code.
         let mut s = String::with_capacity(180);
         s.push_str(&format!("{:?}\n  ", self.game_board));
         for x in (7..13).rev(){
