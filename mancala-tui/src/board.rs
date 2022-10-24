@@ -64,10 +64,10 @@ impl MancalaBoard {
     }
 
     fn draw_arrow(&self, printer: &Printer){
-        let (x, y) = MancalaBoard::cell_to_xy(self.game_state.get_selected_index());
+        let (x, _) = MancalaBoard::cell_to_xy(self.game_state.get_selected_index());
         match self.game_state.get_selected_index() {
-            7..=12 => printer.print((x+2,y-1), "↑"),
-            0..=5 => printer.print((x+2,y-1), "↓"),
+            7..=12 => printer.print((x+2,4), "↑"),
+            0..=5 => printer.print((x+2,4), "↓"),
             _ => unreachable!(),
         }
     }
@@ -129,12 +129,9 @@ impl View for MancalaBoard {
             
             PlayState::Playing => {
                 match event {
-                    Event::Key(Key::Right) => {
-                        self.game_state.move_right();
-                    }
-                    Event::Key(Key::Left) => {
-                        self.game_state.move_left();
-                    }
+                    Event::Key(Key::Right) => self.game_state.move_right(),
+                    Event::Key(Key::Left) => self.game_state.move_left(),
+                    Event::Char(' ') => self.game_state.play(),
                     _ => return EventResult::Ignored
                 }
                 EventResult::Consumed(None)

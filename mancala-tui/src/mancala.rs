@@ -71,13 +71,22 @@ impl Mancala{
         _game_board
     }
 
-    pub fn play(&mut self) -> (){
+    pub fn play(&mut self){
         let chosen = self.get_selected_index() as usize;
         let value: usize = self.game_board[chosen] as usize;
         self.game_board[chosen] = 0;
         for p in 1..=value{
             self.game_board[(p+chosen) % BOARD_LEN] += 1;
         }
+        self.flip_sides();
+    }
+
+    fn flip_sides(&mut self){
+        match self.in_play {
+            Side::Top => self.in_play = Side::Bottom,
+            Side::Bottom => self.in_play = Side::Top,
+        }
+        //self.selected_cell = 0;
     }
 
     pub fn get_selected_index(&self) -> u8{
