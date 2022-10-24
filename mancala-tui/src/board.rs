@@ -1,9 +1,8 @@
-use std::{fmt::format, fs};
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
-use crate::mancala::{Mancala, GameSettings, GameMode, Difficulty};
+use crate::mancala::{Mancala, GameSettings, GameMode, Difficulty, Side};
 use cursive::{
     event::{Event, EventResult, Key, MouseEvent},
     theme::ColorStyle,
@@ -12,24 +11,15 @@ use cursive::{
 };
 
 #[derive(Debug)]
-pub enum BoardState {
+pub enum PlayState {
     Config,
     Playing,
     Finish,
 }
 
 pub struct MancalaBoard {
-    mancala: Mancala,
-    focus: [usize; 2],
-    //history: Vec<([usize; 2], u8)>,
-    //redo: Vec<([usize; 2], u8)>,
-    //undos: usize,
-    //moves: usize,
-    //hints: usize,
-    //conflict: Option<[usize; 2]>,
-    state: BoardState,
-    selected: u8,
-    //stopwatch: Stopwatch,
+    game_state: Mancala,
+    play_state: PlayState
 }
 
 const BOARD_POS_X: usize = 0;
@@ -40,10 +30,8 @@ impl MancalaBoard {
     pub fn new() -> Self{
         let settings: GameSettings = GameSettings {mode: GameMode::Capture, difficulty: Difficulty::Random };
         Self {
-            mancala: Mancala::new(settings),
-            focus:  [0, 0],
-            state: BoardState::Config,
-            selected: 0
+            game_state: Mancala::new(settings),
+            play_state: PlayState::Config,
         }
     }
 
@@ -53,6 +41,8 @@ impl MancalaBoard {
 
     fn draw_playing(&self, printer: &Printer) {
         let offset: Printer = printer.offset(XY{x:BOARD_POS_X, y:BOARD_POS_Y});
+        // will probably refactor how printing is done
+        // currently based off array index but game_state is based off who is playing
         self.draw_base_layer(&offset);
         self.draw_cells(&offset);
         self.draw_arrow(&offset);
@@ -61,21 +51,21 @@ impl MancalaBoard {
     fn draw_cells(&self, printer: &Printer){
         for cell in 0..=13{
             let (x, y) = MancalaBoard::cell_to_xy(cell);
-            if cell == self.selected {
+            if cell == self.game_state.get_selected_index() {
                 printer.print((x, y), "╭╌╌╌╮");
-                printer.print((x, y+1), &format!("╎ {:<2}╎", self.mancala.game_board[cell as usize]));
+                printer.print((x, y+1), &format!("╎ {:<2}╎", self.game_state.game_board[cell as usize]));
                 printer.print((x, y+2), "╰╌╌╌╯");
             }else{
                 printer.print((x, y), "╭───╮");
-                printer.print((x, y+1), &format!("│ {:<2}│", self.mancala.game_board[cell as usize]));
+                printer.print((x, y+1), &format!("│ {:<2}│", self.game_state.game_board[cell as usize]));
                 printer.print((x, y+2), "╰───╯");
             }
         }
     }
 
     fn draw_arrow(&self, printer: &Printer){
-        let (x, y) = MancalaBoard::cell_to_xy(self.selected);
-        match self.selected {
+        let (x, y) = MancalaBoard::cell_to_xy(self.game_state.get_selected_index());
+        match self.game_state.get_selected_index() {
             7..=12 => printer.print((x+2,y-1), "↑"),
             0..=5 => printer.print((x+2,y-1), "↓"),
             _ => unreachable!(),
@@ -113,10 +103,10 @@ impl MancalaBoard {
 // holds how to draw the board on the screen
 impl View for MancalaBoard {
     fn draw(&self, printer: &Printer) {
-        match self.state {
-            BoardState::Config => self.draw_config(printer),
-            BoardState::Playing => self.draw_playing(printer),
-            BoardState::Finish => (),
+        match self.play_state {
+            PlayState::Config => self.draw_config(printer),
+            PlayState::Playing => self.draw_playing(printer),
+            PlayState::Finish => (),
         }
     }
 
@@ -126,31 +116,31 @@ impl View for MancalaBoard {
     }
 
     fn on_event(&mut self, event: Event) -> EventResult {
-        match self.state {
-            BoardState::Config => {
+        match self.play_state {
+            PlayState::Config => {
                 match event {
                     Event::Key(Key::Enter) => {
-                        self.state = BoardState::Playing;
+                        self.play_state = PlayState::Playing;
                     }
                     _ => return EventResult::Ignored,
                 }
                 EventResult::Consumed(None)
             }
             
-            BoardState::Playing => {
+            PlayState::Playing => {
                 match event {
                     Event::Key(Key::Right) => {
-                        self.selected += 1;
+                        self.game_state.move_right();
                     }
                     Event::Key(Key::Left) => {
-                        self.selected -= 1;
+                        self.game_state.move_left();
                     }
                     _ => return EventResult::Ignored
                 }
                 EventResult::Consumed(None)
             }
             
-            BoardState::Finish => EventResult::Ignored,
+            PlayState::Finish => EventResult::Ignored,
         }
     }
 

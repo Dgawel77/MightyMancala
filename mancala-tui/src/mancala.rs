@@ -15,6 +15,12 @@ pub enum Difficulty {
 }
 
 #[derive(Debug)]
+pub enum Side {
+    Top,
+    Bottom,
+}
+
+#[derive(Debug)]
 pub struct GameSettings{
     pub mode: GameMode,
     pub difficulty: Difficulty
@@ -23,14 +29,26 @@ pub struct GameSettings{
 #[derive(Debug)]
 pub struct Mancala{
     pub game_board: [u8; BOARD_LEN],
-    pub game_setting: GameSettings
+    pub game_setting: GameSettings,
+    pub in_play: Side,
+    pub selected_cell: u8,
 }
 
 // holds game data
 impl Mancala{
     pub fn new(settings : GameSettings) -> Self{
+        Self { 
+            game_board: Mancala::generate_game_board(&settings), 
+            game_setting: settings,
+            in_play: Side::Bottom,
+            selected_cell: 0,
+        }
+    }
+
+    fn generate_game_board(settings : &GameSettings) -> [u8; BOARD_LEN]{
         let mut _game_board: [u8; BOARD_LEN] = [0; BOARD_LEN];
         let mut rng = rand::thread_rng();
+        
         match settings.difficulty{
             Difficulty::Normal => {
                 for p in 0..7{
@@ -47,14 +65,14 @@ impl Mancala{
                 }
             }
         };
+        // set the cups to 0
         _game_board[6] = 0;
         _game_board[13] = 0;
-        Self { game_board: _game_board, game_setting: settings }
+        _game_board
     }
 
-    pub fn play(&mut self, chosen: usize) -> (){
-        assert!((chosen != 6) && (chosen != 13));
-        assert!(chosen < BOARD_LEN);
+    pub fn play(&mut self) -> (){
+        let chosen = self.get_selected_index() as usize;
         let value: usize = self.game_board[chosen] as usize;
         self.game_board[chosen] = 0;
         for p in 1..=value{
@@ -62,18 +80,35 @@ impl Mancala{
         }
     }
 
-    // gonna have to change this later
-    pub fn has_won(&self) -> bool {
-        match self.game_setting.mode{
-            GameMode::Avalanche =>{
-                self.game_board[0..6].into_iter().all(|x| *x == 0) || self.game_board[8..13].into_iter().all(|x| *x == 0)
-            },
-            GameMode::Capture => {
-                self.game_board[0..6].into_iter().all(|x| *x == 0) || self.game_board[8..13].into_iter().all(|x| *x == 0)
-            }
+    pub fn get_selected_index(&self) -> u8{
+        match self.in_play{
+            Side::Top => 12 - self.selected_cell,
+            Side::Bottom => self.selected_cell,
         }
-            
     }
+
+    pub fn move_right(&mut self){
+        if self.selected_cell < 5{
+            self.selected_cell += 1
+        }
+    }
+
+    pub fn move_left(&mut self){
+        if self.selected_cell > 0{
+            self.selected_cell -= 1
+        }
+    }
+    // // gonna have to change this later
+    // pub fn has_won(&self) -> bool {
+    //     match self.game_setting.mode{
+    //         GameMode::Avalanche =>{
+    //             self.game_board[0..6].into_iter().all(|x| *x == 0) || self.game_board[8..13].into_iter().all(|x| *x == 0)
+    //         },
+    //         GameMode::Capture => {
+    //             self.game_board[0..6].into_iter().all(|x| *x == 0) || self.game_board[8..13].into_iter().all(|x| *x == 0)
+    //         }
+    //     }    
+    // }
 }
 
 use std::fmt;
