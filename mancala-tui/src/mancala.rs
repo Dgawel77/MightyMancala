@@ -21,32 +21,6 @@ pub enum Side {
 }
 
 pub trait GameState{
-    fn generate_game_board(difficulty: Difficulty) -> [u8; BOARD_LEN] where Self: Sized{
-        let mut _game_board: [u8; BOARD_LEN] = [0; BOARD_LEN];
-        let mut rng = rand::thread_rng();
-        
-        match difficulty{
-            Difficulty::Normal => {
-                for p in 0..7{
-                    _game_board[p] = 4;
-                    _game_board[p+7] = 4;
-                }
-                
-            }
-            Difficulty::Random =>{
-                for p in 0..7{
-                    let random: u8 = rng.gen_range(1..6);
-                    _game_board[p] = random;
-                    _game_board[p+7] = random;
-                }
-            }
-        };
-        // set the cups to 0
-        _game_board[6] = 0;
-        _game_board[13] = 0;
-        _game_board
-    }
-
     fn play(&mut self);
 
     fn move_right(&mut self);
@@ -54,15 +28,9 @@ pub trait GameState{
 }
 
 pub struct Capture{
-    pub game_board: [u8; BOARD_LEN],
-    pub in_play: Side,
-    pub selected_cell: u8,
-}
-
-pub struct Avalanche{
-    pub game_board: [u8; BOARD_LEN],
-    pub in_play: Side,
-    pub selected_cell: u8,
+    game_board: [u8; BOARD_LEN],
+    in_play: Side,
+    selected_cell: u8,
 }
 
 impl GameState for Capture {
@@ -98,6 +66,7 @@ impl GameState for Capture {
         if self.selected_cell < 5{
             self.selected_cell += 1
         }
+        self.hello()
     }
 
     fn move_left(&mut self){
@@ -105,6 +74,17 @@ impl GameState for Capture {
             self.selected_cell -= 1
         }
     }
+}
+
+impl Capture{
+    fn hello(&self){
+        print!("yo gaba gaba");
+    }
+}
+pub struct Avalanche{
+    pub game_board: [u8; BOARD_LEN],
+    pub in_play: Side,
+    pub selected_cell: u8,
 }
 
 impl GameState for Avalanche {

@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
-
+use rand::prelude::*;
 use crate::mancala::{GameMode, Difficulty, Side, GameState, Capture, Avalanche};
 use cursive::{
     event::{Event, EventResult, Key, MouseEvent},
@@ -23,10 +23,12 @@ pub struct GameSettings{
 }
 
 pub struct MancalaBoard {
-    game_state: Option<Box<dyn GameState>>,
+    game_state: Box<dyn GameState>,
     play_state: PlayState,
+    game_settings: GameSettings,
 }
 
+const BOARD_LEN: usize = 14;
 const BOARD_POS_X: usize = 0;
 const BOARD_POS_Y: usize = 0;
 // hold the board info  
@@ -37,22 +39,41 @@ impl MancalaBoard {
             game_state: 
                 match settings.mode {
                     GameMode::Capture => {
-                        Some(Box::new(Capture{
-                            game_board: <Capture as GameState>::generate_game_board(settings.difficulty),
+                        Box::new(Capture{
+                            game_board: MancalaBoard::generate_game_board(settings.difficulty),
                             in_play: Side::Bottom,
                             selected_cell: 0,
-                        }))
+                        })
                     }
                     GameMode::Avalanche => {
-                        Some(Box::new(Avalanche{
-                            game_board: <Avalanche as GameState>::generate_game_board(settings.difficulty),
+                        Box::new(Avalanche{
+                            game_board: MancalaBoard::generate_game_board(settings.difficulty),
                             in_play: Side::Bottom,
                             selected_cell: 0,
-                        }))
+                        })
                     }
                 },
             play_state: PlayState::Config,
+            game_settings: settings
         }
+    }
+
+    fn generate_game_board(difficulty: Difficulty) -> [u8; BOARD_LEN] where Self: Sized{
+        let mut _game_board: [u8; BOARD_LEN] = [0; BOARD_LEN];
+        let mut rng = rand::thread_rng();
+        for p in 0..7{
+            let bowl_value: u8;
+            match difficulty{
+                Difficulty::Normal => bowl_value = 4,
+                Difficulty::Random => bowl_value = rng.gen_range(1..6),
+            }
+            _game_board[p] = bowl_value;
+            _game_board[p+7] = bowl_value;
+        }
+        // set the cups to 0
+        _game_board[6] = 0;
+        _game_board[13] = 0;
+        _game_board
     }
 
     fn draw_config(&self, printer: &Printer) {
@@ -68,7 +89,7 @@ impl MancalaBoard {
         self.draw_arrow(&offset);
     }
 
-    fn get_stuff(){
+    fn get_stuff(&self){
         
     }
 
