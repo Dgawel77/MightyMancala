@@ -1,5 +1,5 @@
 use cursive::{views::{Dialog, LinearLayout}, Cursive, view::Nameable};
-use crate::{mancala::{self, Mancala, GameSettings, GameMode, Difficulty}, game};
+use crate::{mancala::{GameMode, Difficulty}, game};
 use std::io::Write;
 use std::str::FromStr;
 use std::error::Error;

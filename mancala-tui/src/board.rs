@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
-use crate::mancala::{Mancala, GameSettings, GameMode, Difficulty, Side};
+use crate::mancala::{GameMode, Difficulty, Side, GameState, Capture, Avalanche};
 use cursive::{
     event::{Event, EventResult, Key, MouseEvent},
     theme::ColorStyle,
@@ -17,20 +17,40 @@ pub enum PlayState {
     Finish,
 }
 
+pub struct GameSettings{
+     pub mode: GameMode,
+     pub difficulty: Difficulty
+}
+
 pub struct MancalaBoard {
-    game_state: Mancala,
-    play_state: PlayState
+    game_state: Option<Box<dyn GameState>>,
+    play_state: PlayState,
 }
 
 const BOARD_POS_X: usize = 0;
 const BOARD_POS_Y: usize = 0;
 // hold the board info  
 impl MancalaBoard {
-    
     pub fn new() -> Self{
         let settings: GameSettings = GameSettings {mode: GameMode::Capture, difficulty: Difficulty::Random };
         Self {
-            game_state: Mancala::new(settings),
+            game_state: 
+                match settings.mode {
+                    GameMode::Capture => {
+                        Some(Box::new(Capture{
+                            game_board: <Capture as GameState>::generate_game_board(settings.difficulty),
+                            in_play: Side::Bottom,
+                            selected_cell: 0,
+                        }))
+                    }
+                    GameMode::Avalanche => {
+                        Some(Box::new(Avalanche{
+                            game_board: <Avalanche as GameState>::generate_game_board(settings.difficulty),
+                            in_play: Side::Bottom,
+                            selected_cell: 0,
+                        }))
+                    }
+                },
             play_state: PlayState::Config,
         }
     }
@@ -46,6 +66,10 @@ impl MancalaBoard {
         self.draw_base_layer(&offset);
         self.draw_cells(&offset);
         self.draw_arrow(&offset);
+    }
+
+    fn get_stuff(){
+        
     }
 
     fn draw_cells(&self, printer: &Printer){
