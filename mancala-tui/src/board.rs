@@ -17,6 +17,7 @@ pub enum PlayState {
     Finish,
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct GameSettings{
      pub mode: GameMode,
      pub difficulty: Difficulty
@@ -33,8 +34,7 @@ const BOARD_POS_X: usize = 0;
 const BOARD_POS_Y: usize = 0;
 // hold the board info  
 impl MancalaBoard {
-    pub fn new() -> Self{
-        let settings: GameSettings = GameSettings {mode: GameMode::Capture, difficulty: Difficulty::Random };
+    pub fn new(settings: GameSettings) -> Self{
         Self {
             game_state: 
                 match settings.mode {
@@ -85,27 +85,24 @@ impl MancalaBoard {
         // will probably refactor how printing is done
         // currently based off array index but game_state is based off who is playing
         self.draw_base_layer(&offset);
-        self.draw_cells(&offset);
         self.draw_arrow(&offset);
+        self.draw_selected_cell(&offset);
+        self.draw_values(&offset);
     }
 
-    fn get_stuff(&self){
-        
-    }
-
-    fn draw_cells(&self, printer: &Printer){
+    fn draw_values(&self, printer: &Printer){
         for cell in 0..=13{
             let (x, y) = MancalaBoard::cell_to_xy(cell);
-            if cell == self.game_state.get_selected_index() {
-                printer.print((x, y), "╭╌╌╌╮");
-                printer.print((x, y+1), &format!("╎ {:<2}╎", self.game_state.game_board[cell as usize]));
-                printer.print((x, y+2), "╰╌╌╌╯");
-            }else{
-                printer.print((x, y), "╭───╮");
-                printer.print((x, y+1), &format!("│ {:<2}│", self.game_state.game_board[cell as usize]));
-                printer.print((x, y+2), "╰───╯");
-            }
+            printer.print((x+2, y+1), &format!("{}", self.game_state.get_value(cell as usize)));
         }
+    }
+
+    fn draw_selected_cell(&self, printer: &Printer){
+        let selected_cell: u8 = self.game_state.get_selected_index();
+        let (x, y) = MancalaBoard::cell_to_xy(selected_cell);
+        printer.print((x, y), "╭╌╌╌╮");
+        printer.print((x, y+1), "╎   ╎");
+        printer.print((x, y+2), "╰╌╌╌╯");
     }
 
     fn draw_arrow(&self, printer: &Printer){
@@ -134,6 +131,7 @@ impl MancalaBoard {
     }
 
     fn cell_to_xy(cell: u8) -> (u8, u8){
+        // bunch of magic to make the formating work with my data scheme
         match cell {
             6 => (41, 3),
             13 => (2, 3),

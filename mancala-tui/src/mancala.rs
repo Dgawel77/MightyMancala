@@ -1,36 +1,43 @@
 use rand::prelude::*;
+use core::ops::IndexMut;
 
 const BOARD_LEN: usize = 14;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum GameMode {
     Capture,
     Avalanche,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Difficulty {
     Normal,
     Random,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Side {
     Top,
     Bottom,
 }
 
+// index works on the 0-13 system 
+// 0-5 bottom row going right 
+// 6 right bowl 
+// 7-12 top row going Left
+// 13 left bowl
 pub trait GameState{
     fn play(&mut self);
-
+    fn get_selected_index(&self) -> u8;
+    fn get_value(&self, pos: usize) -> u8;
     fn move_right(&mut self);
     fn move_left(&mut self);
 }
 
 pub struct Capture{
-    game_board: [u8; BOARD_LEN],
-    in_play: Side,
-    selected_cell: u8,
+    pub game_board: [u8; BOARD_LEN],
+    pub in_play: Side,
+    pub selected_cell: u8,
 }
 
 impl GameState for Capture {
@@ -62,11 +69,21 @@ impl GameState for Capture {
     //     }
     // }
 
+    fn get_value(&self, pos: usize) -> u8{
+        self.game_board[pos]
+    }
+
+    fn get_selected_index(&self) -> u8{
+        match self.in_play {
+            Side::Top => 13 - self.selected_cell,
+            Side::Bottom => self.selected_cell,
+        }
+    }
+
     fn move_right(&mut self){
         if self.selected_cell < 5{
             self.selected_cell += 1
         }
-        self.hello()
     }
 
     fn move_left(&mut self){
@@ -81,6 +98,7 @@ impl Capture{
         print!("yo gaba gaba");
     }
 }
+
 pub struct Avalanche{
     pub game_board: [u8; BOARD_LEN],
     pub in_play: Side,
@@ -92,6 +110,17 @@ impl GameState for Avalanche {
         
     }
     
+    fn get_value(&self, pos: usize) -> u8{
+        self.game_board[pos]
+    }
+
+    fn get_selected_index(&self) -> u8{
+        match self.in_play {
+            Side::Top => 13 - self.selected_cell,
+            Side::Bottom => self.selected_cell,
+        }
+    }
+
     fn move_right(&mut self){
         if self.selected_cell < 5{
             self.selected_cell += 1
