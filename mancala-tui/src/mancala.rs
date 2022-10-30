@@ -42,32 +42,19 @@ pub struct Capture{
 
 impl GameState for Capture {
     fn play(&mut self){
-    
+        let chosen_cell: usize = self.get_selected_index() as usize;
+        let value: usize = self.game_board[chosen_cell] as usize;
+        let end_cell: usize = (chosen_cell + value) % BOARD_LEN;
+        self.game_board[chosen_cell] = 0;
+        for p in 1..=value{
+            self.game_board[(p+chosen_cell) % BOARD_LEN] += 1;
+        }
+
+        if end_cell != 6 && end_cell != 13{
+            self.flip_sides();
+        }
+        // add the actual capture functionality
     }
-    // fn play(&mut self){
-    //     let chosen = self.get_selected_index() as usize;
-    //     let value: usize = self.game_board[chosen] as usize;
-    //     self.game_board[chosen] = 0;
-    //     for p in 1..=value{
-    //         self.game_board[(p+chosen) % BOARD_LEN] += 1;
-    //     }
-    //     self.flip_sides();
-    // }
-
-    // fn flip_sides(&mut self){
-    //     match self.in_play {
-    //         Side::Top => self.in_play = Side::Bottom,
-    //         Side::Bottom => self.in_play = Side::Top,
-    //     }
-    //     //self.selected_cell = 0;
-    // }
-
-    // fn get_selected_index(&self) -> u8{
-    //     match self.in_play{
-    //         Side::Top => 12 - self.selected_cell,
-    //         Side::Bottom => self.selected_cell,
-    //     }
-    // }
 
     fn get_value(&self, pos: usize) -> u8{
         self.game_board[pos]
@@ -75,7 +62,7 @@ impl GameState for Capture {
 
     fn get_selected_index(&self) -> u8{
         match self.in_play {
-            Side::Top => 13 - self.selected_cell,
+            Side::Top => 12 - self.selected_cell,
             Side::Bottom => self.selected_cell,
         }
     }
@@ -94,8 +81,11 @@ impl GameState for Capture {
 }
 
 impl Capture{
-    fn hello(&self){
-        print!("yo gaba gaba");
+    fn flip_sides(&mut self){
+        match self.in_play {
+            Side::Top => self.in_play = Side::Bottom,
+            Side::Bottom => self.in_play = Side::Top,
+        }
     }
 }
 

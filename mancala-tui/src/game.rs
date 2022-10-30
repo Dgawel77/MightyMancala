@@ -8,7 +8,7 @@ use crate::board::{MancalaBoard, GameSettings};
 pub fn run(){
     let mut siv = cursive::default();
     
-    let board: MancalaBoard = MancalaBoard::new(GameSettings {mode: GameMode::Capture, difficulty: Difficulty::Random });
+    let board: MancalaBoard = MancalaBoard::new(GameSettings {mode: GameMode::Capture, difficulty: Difficulty::Normal });
 
     siv.add_global_callback('q', Cursive::quit);
 

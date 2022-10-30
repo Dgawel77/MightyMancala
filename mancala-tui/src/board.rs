@@ -175,6 +175,7 @@ impl View for MancalaBoard {
                     Event::Key(Key::Right) => self.game_state.move_right(),
                     Event::Key(Key::Left) => self.game_state.move_left(),
                     Event::Char(' ') => self.game_state.play(),
+                    Event::Key(Key::Enter) => self.game_state.play(),
                     _ => return EventResult::Ignored
                 }
                 EventResult::Consumed(None)
