@@ -39,8 +39,36 @@ impl Cell {
     }
 
     fn flip_sides(&mut self){
-
+        match self.side {
+            Side::Top => self.side = Side::Bottom,
+            Side::Bottom => self.side = Side::Top,
+        }
     }
+
+    // fn add_value(&mut self, vaule: usize) -> Cell{
+    //     let cur_index: usize = self.to_index();
+    //     let end_index: usize = (cur_index + vaule) % BOARD_LEN;
+    //     match end_index {
+    //         0..=6 => {
+    //             Cell {
+    //                 side: Side::Bottom, 
+    //                 pos: end_index,
+    //             }
+    //         }
+    //         7..=12 => {
+    //             Cell {
+    //                 side: Side::Top, 
+    //                 pos: 12 - end_index,
+    //             }
+    //         }
+    //         13 => {
+    //             Cell {
+    //                 side: Side::Top, 
+    //                 pos: 13,
+    //             }
+    //         }
+    //     }
+    // }
 
     fn move_right(&mut self){
         if self.pos < 5{
@@ -70,9 +98,10 @@ pub struct Capture{
 
 impl GameState for Capture {
     fn play(&mut self){
-        //let chosen_cell: usize = self.get_selected_cell() as usize;
-        // let value: usize = self.game_board[chosen_cell] as usize;
-        // let end_cell: usize = (chosen_cell + value) % BOARD_LEN;
+        //let mut chosen_cell: Cell = self.get_selected_cell();
+        //let value: usize = self.game_board[chosen_cell.to_index()];
+        //et end_cell: &mut Cell = chosen_cell.add_value(value);
+
         // self.game_board[chosen_cell] = 0;
         // // update the board nums
         // for p in 1..=value{
