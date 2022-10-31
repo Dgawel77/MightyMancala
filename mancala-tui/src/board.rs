@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 use rand::prelude::*;
-use crate::mancala::{GameMode, Difficulty, Side, GameState, Capture, Avalanche};
+use crate::mancala::{GameMode, Difficulty, Side, GameState, Capture, Avalanche, Cell};
 use cursive::{
     event::{Event, EventResult, Key, MouseEvent},
     theme::ColorStyle,
@@ -41,15 +41,13 @@ impl MancalaBoard {
                     GameMode::Capture => {
                         Box::new(Capture{
                             game_board: MancalaBoard::generate_game_board(settings.difficulty),
-                            in_play: Side::Bottom,
-                            selected_cell: 0,
+                            selected_cell: Cell{side: Side::Bottom, pos: 0},
                         })
                     }
                     GameMode::Avalanche => {
                         Box::new(Avalanche{
                             game_board: MancalaBoard::generate_game_board(settings.difficulty),
-                            in_play: Side::Bottom,
-                            selected_cell: 0,
+                            selected_cell: Cell{side: Side::Bottom, pos: 0},
                         })
                     }
                 },
@@ -58,11 +56,11 @@ impl MancalaBoard {
         }
     }
 
-    fn generate_game_board(difficulty: Difficulty) -> [u8; BOARD_LEN] where Self: Sized{
-        let mut _game_board: [u8; BOARD_LEN] = [0; BOARD_LEN];
+    fn generate_game_board(difficulty: Difficulty) -> [usize; BOARD_LEN] where Self: Sized{
+        let mut _game_board: [usize; BOARD_LEN] = [0; BOARD_LEN];
         let mut rng = rand::thread_rng();
         for p in 0..7{
-            let bowl_value: u8;
+            let bowl_value: usize;
             match difficulty{
                 Difficulty::Normal => bowl_value = 4,
                 Difficulty::Random => bowl_value = rng.gen_range(1..6),
@@ -82,8 +80,6 @@ impl MancalaBoard {
 
     fn draw_playing(&self, printer: &Printer) {
         let offset: Printer = printer.offset(XY{x:BOARD_POS_X, y:BOARD_POS_Y});
-        // will probably refactor how printing is done
-        // currently based off array index but game_state is based off who is playing
         self.draw_base_layer(&offset);
         self.draw_arrow(&offset);
         self.draw_selected_cell(&offset);
@@ -91,14 +87,27 @@ impl MancalaBoard {
     }
 
     fn draw_values(&self, printer: &Printer){
-        for cell in 0..=13{
-            let (x, y) = MancalaBoard::cell_to_xy(cell);
-            printer.print((x+2, y+1), &format!("{}", self.game_state.get_value(cell as usize)));
+        for side in [Side::Top, Side::Bottom]{
+            for pos in 0..=6{
+                let cell = Cell{side: side, pos: pos};
+                let (x, y) = MancalaBoard::cell_to_xy(cell);
+                printer.print((x+2, y+1), &format!("{}", self.game_state.get_value(cell)));
+            }
         }
+        
+        // for pos in 0..=6{
+        //     let top_cell = Cell{side: Side::Top, pos: pos};
+        //     let (x, y) = MancalaBoard::cell_to_xy(top_cell);
+        //     printer.print((x+2, y+1), &format!("{}", self.game_state.get_value(top_cell)));
+
+        //     let bottom_cell = Cell{side: Side::Bottom, pos: pos};
+        //     let (x, y) = MancalaBoard::cell_to_xy(bottom_cell);
+        //     printer.print((x+2, y+1), &format!("{}", self.game_state.get_value(bottom_cell)));
+        // }
     }
 
     fn draw_selected_cell(&self, printer: &Printer){
-        let selected_cell: u8 = self.game_state.get_selected_index();
+        let selected_cell: Cell = self.game_state.get_selected_cell();
         let (x, y) = MancalaBoard::cell_to_xy(selected_cell);
         printer.print((x, y), "╭╌╌╌╮");
         printer.print((x, y+1), "╎   ╎");
@@ -106,11 +115,11 @@ impl MancalaBoard {
     }
 
     fn draw_arrow(&self, printer: &Printer){
-        let (x, _) = MancalaBoard::cell_to_xy(self.game_state.get_selected_index());
-        match self.game_state.get_selected_index() {
-            7..=12 => printer.print((x+2,4), "↑"),
-            0..=5 => printer.print((x+2,4), "↓"),
-            _ => unreachable!(),
+        let selected_cell: Cell = self.game_state.get_selected_cell();
+        let (x, _) = MancalaBoard::cell_to_xy(selected_cell);
+        match selected_cell {
+            Cell{side: Side::Top, pos: _} => printer.print((x + 2, 4), "↑"),
+            Cell{side: Side::Bottom, pos: _} => printer.print((x + 2, 4), "↓"),
         }
     }
 
@@ -130,14 +139,13 @@ impl MancalaBoard {
         Ok(io::BufReader::new(file).lines())
     }
 
-    fn cell_to_xy(cell: u8) -> (u8, u8){
+    fn cell_to_xy(cell: Cell) -> (usize, usize){
         // bunch of magic to make the formating work with my data scheme
         match cell {
-            6 => (41, 3),
-            13 => (2, 3),
-            0..=5 => (9+cell*5, 5),
-            7..=12 => (69-cell*5, 1),
-            _ => unreachable!()
+            Cell{side: Side::Top, pos: 6} => (2, 3),
+            Cell{side: Side::Top, pos: _} => (9 + 5 * cell.pos, 1),
+            Cell{side: Side::Bottom, pos: 6}  => (41, 3),
+            Cell{side: Side::Bottom, pos: _} => (9 + 5 * cell.pos, 5),
         }
     }
 
@@ -174,8 +182,7 @@ impl View for MancalaBoard {
                 match event {
                     Event::Key(Key::Right) => self.game_state.move_right(),
                     Event::Key(Key::Left) => self.game_state.move_left(),
-                    Event::Char(' ') => self.game_state.play(),
-                    Event::Key(Key::Enter) => self.game_state.play(),
+                    Event::Char(' ') | Event::Key(Key::Enter) => self.game_state.play(),
                     _ => return EventResult::Ignored
                 }
                 EventResult::Consumed(None)
