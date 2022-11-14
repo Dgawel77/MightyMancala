@@ -1,6 +1,3 @@
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
 use rand::prelude::*;
 use crate::mancala::{GameMode, Difficulty, Side, GameState, Capture, Avalanche, Cell};
 use cursive::{
@@ -9,6 +6,8 @@ use cursive::{
     view::View,
     Printer, Vec2, XY,
 };
+
+use crate::lib::read_lines;
 
 #[derive(Debug)]
 pub enum PlayState {
@@ -114,19 +113,13 @@ impl MancalaBoard {
     }
 
     fn draw_base_layer(&self, printer: &Printer){
-        if let Ok(lines) = MancalaBoard::read_lines("assets/boardSchematic.txt"){
+        if let Ok(lines) = read_lines("assets/boardSchematic.txt"){
             for (position, line) in lines.enumerate(){
                 if let Ok(ip) = line{
                     printer.print((0, position), &ip);
                 }
             }
         }
-    }
-
-    fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-    where P: AsRef<Path>, {
-        let file = File::open(filename)?;
-        Ok(io::BufReader::new(file).lines())
     }
 
     fn cell_to_xy(cell: Cell) -> (usize, usize){
