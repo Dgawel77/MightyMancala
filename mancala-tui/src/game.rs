@@ -8,30 +8,11 @@ use crate::{mancala::{GameMode, Difficulty}, game};
 use std::io::Write;
 use std::str::FromStr;
 use std::error::Error;
+use cursive_aligned_view::AlignedView;
 use crate::board::{MancalaBoard, GameSettings};
 use crate::lib::read_string;
 
 pub fn run(){
-    // gonna have to redo a lot of the ui
-    // let mut select_mode = SelectView::<GameMode>::new().h_align(HAlign::Left);
-    // select_mode.add_item("Capture", GameMode::Capture);
-    // select_mode.add_item("Avalanche", GameMode::Avalanche);
-
-    // select_mode.set_on_submit(|s, time| {
-    //     // s.pop_layer();
-    //     // let text = format!("You will wait for {} minutes...", time);
-    //     // s.add_layer(
-    //     //     Dialog::around(TextView::new(text)).button("Quit", |s| s.quit()),
-    //     // );
-    // });
-
-    // let mut siv = Cursive::default();
-    // siv.add_layer(Dialog::around(
-    //     LinearLayout::horizontal()
-    //     .child(select_mode)
-    // ).title("Mighty Mancala"));
-    // siv.run(); 
-    // set settings and other stuff
     let mut siv = Cursive::default();
     let settings: GameSettings = GameSettings{mode: GameMode::Capture, difficulty: Difficulty::Normal };
     siv.set_user_data(settings);
@@ -81,20 +62,18 @@ pub fn run(){
     let homepage = Dialog::around(
     LinearLayout::vertical()
     .child(logo)
+    .child(DummyView)
     .child(
+    AlignedView::with_center(
         LinearLayout::horizontal()
-        .child(
-            Dialog::around(select_mode)
-                .title("Mode")
-                .fixed_width(17)
-        )
+        .child(Dialog::around(select_mode)
+            .title("Mode")
+            .fixed_width(17))
         .child(DummyView)
-        .child(
-            Dialog::around(select_difficulty)
-                .title("Difficulty")
-                .fixed_width(17)
-        )
-        .child(buttons))
+        .child(Dialog::around(select_difficulty)
+            .title("Difficulty")
+            .fixed_width(17))
+        .child(buttons)))
     );
 
     siv.add_layer(homepage);
