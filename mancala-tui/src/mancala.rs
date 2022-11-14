@@ -60,30 +60,6 @@ impl Cell {
             _ => unreachable!(),
         }
     }
-    // fn add_value(&mut self, vaule: usize) -> Cell{
-    //     let cur_index: usize = self.to_index();
-    //     let end_index: usize = (cur_index + vaule) % BOARD_LEN;
-    //     match end_index {
-    //         0..=6 => {
-    //             Cell {
-    //                 side: Side::Bottom, 
-    //                 pos: end_index,
-    //             }
-    //         }
-    //         7..=12 => {
-    //             Cell {
-    //                 side: Side::Top, 
-    //                 pos: 12 - end_index,
-    //             }
-    //         }
-    //         13 => {
-    //             Cell {
-    //                 side: Side::Top, 
-    //                 pos: 13,
-    //             }
-    //         }
-    //     }
-    // }
 
     fn move_right(&mut self){
         if self.pos < 5{

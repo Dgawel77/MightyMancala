@@ -94,16 +94,6 @@ impl MancalaBoard {
                 printer.print((x+2, y+1), &format!("{}", self.game_state.get_value(cell)));
             }
         }
-        
-        // for pos in 0..=6{
-        //     let top_cell = Cell{side: Side::Top, pos: pos};
-        //     let (x, y) = MancalaBoard::cell_to_xy(top_cell);
-        //     printer.print((x+2, y+1), &format!("{}", self.game_state.get_value(top_cell)));
-
-        //     let bottom_cell = Cell{side: Side::Bottom, pos: pos};
-        //     let (x, y) = MancalaBoard::cell_to_xy(bottom_cell);
-        //     printer.print((x+2, y+1), &format!("{}", self.game_state.get_value(bottom_cell)));
-        // }
     }
 
     fn draw_selected_cell(&self, printer: &Printer){

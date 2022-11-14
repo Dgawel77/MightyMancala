@@ -16,3 +16,4 @@ Cargo.lock
 CSC362.code-workspace
 .obsidian
 sudoku-tui
+cursive_menu_example
