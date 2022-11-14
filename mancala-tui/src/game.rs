@@ -17,8 +17,16 @@ pub fn run(){
     let settings: GameSettings = GameSettings{mode: GameMode::Capture, difficulty: Difficulty::Normal };
     siv.set_user_data(settings);
     siv.add_global_callback('q', Cursive::quit);
+
+    siv.add_layer(get_home_page());
     
-    // =================================================
+    //let board: MancalaBoard = MancalaBoard::new(GameSettings {mode: GameMode::Capture, difficulty: Difficulty::Normal });
+    //siv.add_layer(Dialog::around(board.with_name("board")));
+    siv.run();
+}
+
+fn get_home_page() -> Dialog{
+// =================================================
     // Make the Mode selection
     // =================================================
     let mode_closure = |s: &mut Cursive, mode: &GameMode|{
@@ -48,8 +56,8 @@ pub fn run(){
     // Make the Buttons
     // =================================================
     let buttons = LinearLayout::vertical()
-        .child(Button::new("Start", dummy))
-        .child(Button::new("Help", dummy));
+        .child(Button::new("Play", play_game))
+        .child(Button::new("About", about_window));
 
     // =================================================
     // Make the Logo
@@ -59,32 +67,45 @@ pub fn run(){
     // =================================================
     // Make the Homepage
     // =================================================
-    let homepage = Dialog::around(
-    LinearLayout::vertical()
-    .child(logo)
-    .child(DummyView)
-    .child(
-    AlignedView::with_center(
-        LinearLayout::horizontal()
-        .child(Dialog::around(select_mode)
-            .title("Mode")
-            .fixed_width(17))
+    Dialog::around(
+        LinearLayout::vertical()
+        .child(logo)
         .child(DummyView)
-        .child(Dialog::around(select_difficulty)
-            .title("Difficulty")
-            .fixed_width(17))
-        .child(buttons)))
-    );
-
-    siv.add_layer(homepage);
-    
-    //let board: MancalaBoard = MancalaBoard::new(GameSettings {mode: GameMode::Capture, difficulty: Difficulty::Normal });
-    //siv.add_layer(Dialog::around(board.with_name("board")));
-    
-    siv.run();
+        .child(
+        AlignedView::with_center(
+            LinearLayout::horizontal()
+            .child(Dialog::around(select_mode)
+                .title("Mode")
+                .fixed_width(17))
+            .child(DummyView)
+            .child(Dialog::around(select_difficulty)
+                .title("Difficulty")
+                .fixed_width(17))
+            .child(buttons)))
+    )
 }
 
-fn dummy(s: &mut Cursive) {
-    let data: GameSettings = s.take_user_data().unwrap();
-    dbg!(data);
+fn play_game(s: &mut Cursive) {
+    let settings: GameSettings = s.take_user_data().unwrap();
+    let board: MancalaBoard = MancalaBoard::new(settings);
+    s.pop_layer();
+    s.add_layer(
+        Dialog::around(board.with_name("board"))
+        //.button("Quit", |s: &mut Cursive|{
+        //    s.pop_layer();
+        //    s.add_layer(get_home_page());
+        //})
+        .fixed_height(20).fixed_width(70)
+    );
+}
+
+fn about_window(s: &mut Cursive) -> (){
+    s.pop_layer();
+    s.add_layer(
+        Dialog::around(TextView::new(read_string("assets/help_page.txt")))
+        .button("Quit", |s: &mut Cursive|{
+            s.pop_layer();
+            s.add_layer(get_home_page());
+        })
+    );
 }

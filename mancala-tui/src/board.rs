@@ -50,7 +50,7 @@ impl MancalaBoard {
                         })
                     }
                 },
-            play_state: PlayState::Config,
+            play_state: PlayState::Playing,
             game_settings: settings
         }
     }

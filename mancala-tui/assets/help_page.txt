@@ -1,0 +1,8 @@
+Modes:
+    Capture: 
+    Avalanche:
+
+Difficulty:
+    Normal: Every bowl gets 4 stones.
+    Random: Every bowl gets a random ammount of stones from 2-6. 
+            (Opponents side is mirrored)
