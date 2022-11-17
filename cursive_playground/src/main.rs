@@ -1,35 +1,34 @@
 use cursive::Cursive;
 use cursive::views::{Button, Dialog, DummyView, EditView,
-                     LinearLayout, SelectView};
+                     LinearLayout, SelectView, HideableView};
 use cursive::traits::*;
 use cursive::views::TextView;
 use cursive_tabs::TabPanel;
 use cursive::view::Nameable;
 use cursive::event::{Event, EventResult, Key};
 use cursive::views::{Canvas};
-use unicode_width::UnicodeWidthStr;
+
+use cursive::views::{EnableableView, Checkbox};
 
 fn main(){
-    let state = String::new();
-    let canvas = Canvas::new(state)
-        .with_draw(|text: &String, printer| {
-            // Simply print our string
-            printer.print((0, 0), text);
-        })
-        .with_on_event(|text: &mut String, event| match event {
-            Event::Char(c) => {
-                text.push(c);
-                EventResult::Consumed(None)
-            }
-            Event::Key(Key::Enter) => {
-                let text = text.clone();
-                EventResult::with_cb(move |s| {
-                    s.add_layer(Dialog::info(&text));
-                })
-            }
-            _ => EventResult::Ignored,
-        })
-        .with_required_size(|text, _constraints| (text.width(), 1).into());
+    let mut siv = cursive::default();
+    siv.add_layer(
+        Dialog::around(
+        LinearLayout::vertical()
+        .child(HideableView::new(
+            TextView::new("Hello")
+        ).with_name("main"))
+        .child(EnableableView::new(Checkbox::new()).with_name("my_view"))
+        .child(Button::new("Toggle", |s| {
+            s.call_on_name("main", |v: &mut HideableView<TextView>| {
+                // This will disable (or re-enable) the checkbox, preventing the user from
+                // interacting with it.
+                v.set_visible(!v.is_visible());
+            });
+        })))
+    );
+
+    siv.run();
 }
 
 fn example() {

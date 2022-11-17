@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use rand::prelude::*;
 use crate::mancala::{GameMode, Difficulty, Side, GameState, Capture, Avalanche, Cell};
 use cursive::{
@@ -24,8 +26,7 @@ pub struct GameSettings{
 
 pub struct MancalaBoard {
     game_state: Box<dyn GameState>,
-    play_state: PlayState,
-    game_settings: GameSettings,
+    play_state: PlayState
 }
 
 const BOARD_LEN: usize = 14;
@@ -33,7 +34,7 @@ const BOARD_POS_X: usize = 0;
 const BOARD_POS_Y: usize = 0;
 // hold the board info  
 impl MancalaBoard {
-    pub fn new(settings: GameSettings) -> Self{
+    pub fn new(settings: &GameSettings) -> Self{
         Self {
             game_state: 
                 match settings.mode {
@@ -50,8 +51,7 @@ impl MancalaBoard {
                         })
                     }
                 },
-            play_state: PlayState::Playing,
-            game_settings: settings
+            play_state: PlayState::Playing
         }
     }
 

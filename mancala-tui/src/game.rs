@@ -1,6 +1,7 @@
+use cursive::view::Selector;
 use cursive::{Cursive, CursiveExt};
 use cursive::views::{Button, Dialog, DummyView, EditView,
-                     LinearLayout, SelectView, SliderView, TextView, BoxedView, TextArea, TextContent};
+                     LinearLayout, SelectView, SliderView, TextView, BoxedView, TextArea, TextContent, CircularFocus};
 use cursive::align::{Align, HAlign};
 use cursive::traits::*;
 use cursive::{view::Nameable};
@@ -12,9 +13,16 @@ use cursive_aligned_view::AlignedView;
 use crate::board::{MancalaBoard, GameSettings};
 use crate::lib::read_string;
 
-pub fn run(){
-    let mut siv = Cursive::default();
+pub fn run() -> Result<(), ()>{
+    // backend that does not flicker
+    // let backend_init = || -> std::io::Result<Box<dyn cursive::backend::Backend>> {
+    //     let backend = cursive::backends::crossterm::Backend::init()?;
+    //     let buffered_backend = cursive_buffered_backend::BufferedBackend::new(backend);
+    //     Ok(Box::new(buffered_backend))
+    // };
+    let mut siv = Cursive::new();
     let settings: GameSettings = GameSettings{mode: GameMode::Capture, difficulty: Difficulty::Normal };
+    
     siv.set_user_data(settings);
     siv.add_global_callback('q', Cursive::quit);
 
@@ -22,7 +30,9 @@ pub fn run(){
     
     //let board: MancalaBoard = MancalaBoard::new(GameSettings {mode: GameMode::Capture, difficulty: Difficulty::Normal });
     //siv.add_layer(Dialog::around(board.with_name("board")));
+    //siv.try_run_with(backend_init).ok();
     siv.run();
+    Ok(())
 }
 
 fn get_home_page() -> Dialog{
@@ -86,17 +96,19 @@ fn get_home_page() -> Dialog{
 }
 
 fn play_game(s: &mut Cursive) {
-    let settings: GameSettings = s.take_user_data().unwrap();
+    let settings: &mut GameSettings = s.user_data().unwrap();
     let board: MancalaBoard = MancalaBoard::new(settings);
     s.pop_layer();
     s.add_layer(
         Dialog::around(board.with_name("board"))
-        //.button("Quit", |s: &mut Cursive|{
+        .fixed_height(20)
+        .fixed_width(50)
+        //.child(Button::new("Quit", |s: &mut Cursive|{
         //    s.pop_layer();
         //    s.add_layer(get_home_page());
-        //})
-        .fixed_height(20).fixed_width(70)
+        //}))
     );
+    // s.focus(&Selector::Name("board"));
 }
 
 fn about_window(s: &mut Cursive) -> (){
