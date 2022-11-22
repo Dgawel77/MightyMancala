@@ -1,6 +1,7 @@
 mod game;
 mod mancala;
 mod board;
+mod tests;
 
 fn main(){
     game::run();

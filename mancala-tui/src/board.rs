@@ -174,5 +174,4 @@ impl View for MancalaBoard {
             PlayState::Finish => EventResult::Ignored,
         }
     }
-
 }
