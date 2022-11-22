@@ -13,6 +13,17 @@ mod capture_tests{
     }
 
     #[test]
+    fn capture_no_move() {
+        let mut game_state = Box::new(Capture{
+            game_board: [0,4,4,4,4,4,0,4,4,4,4,4,4,0],
+            selected_cell: Cell{side: Side::Bottom, pos: 0},
+        });
+        game_state.play();
+        assert_eq!(game_state.game_board, [0,4,4,4,4,4,0,4,4,4,4,4,4,0]);
+        assert_eq!(game_state.selected_cell, Cell{side: Side::Bottom, pos:0});
+    }
+
+    #[test]
     fn capture_play_bottom() {
         let mut game_state = Box::new(Capture{
             game_board: [4,4,4,4,4,4,0,4,4,4,4,4,4,0],
@@ -145,4 +156,74 @@ mod capture_tests{
         assert_eq!(game_state.selected_cell, Cell{side: Side::Top, pos:0});
     }
 
+}
+
+#[cfg(test)]
+mod avalanche_tests{
+    use crate::mancala::{Side, GameState, Avalanche, Cell};
+    
+    #[test]
+    fn avalanche_intialization() {
+        let game_state = Box::new(Avalanche{
+            game_board: [4,4,4,4,4,4,0,4,4,4,4,4,4,0],
+            selected_cell: Cell{side: Side::Bottom, pos: 0},
+        });
+        assert_eq!(game_state.game_board, [4,4,4,4,4,4,0,4,4,4,4,4,4,0]);
+        assert_eq!(game_state.selected_cell, Cell{side: Side::Bottom, pos:0});
+    }
+
+    #[test]
+    fn avalanche_no_move() {
+        let mut game_state = Box::new(Avalanche{
+            game_board: [0,4,4,4,4,4,0,4,4,4,4,4,4,0],
+            selected_cell: Cell{side: Side::Bottom, pos: 0},
+        });
+        game_state.play();
+        assert_eq!(game_state.game_board, [0,4,4,4,4,4,0,4,4,4,4,4,4,0]);
+        assert_eq!(game_state.selected_cell, Cell{side: Side::Bottom, pos:0});
+    }
+
+    #[test]
+    fn avalanche_play_bottom() {
+        let mut game_state = Box::new(Avalanche{
+            game_board: [4,4,0,5,5,5,1,4,4,4,4,4,4,0],
+            selected_cell: Cell{side: Side::Bottom, pos: 1},
+        });
+        game_state.play();
+        assert_eq!(game_state.game_board, [6,2,3,1,7,1,3,6,6,6,0,1,6,0]);
+        assert_eq!(game_state.selected_cell, Cell{side: Side::Top, pos:1});
+    }
+
+    // #[test]
+    // fn avalanche_play_top() {
+    //     let mut game_state = Box::new(Avalanche{
+    //         game_board: [4,4,0,5,5,5,1,4,4,4,4,4,4,0],
+    //         selected_cell: Cell{side: Side::Top, pos: 2},
+    //     });
+    //     game_state.play();
+    //     assert_eq!(game_state.game_board, [4,4,0,5,5,5,1,4,4,4,4,4,4,0]);
+    //     assert_eq!(game_state.selected_cell, Cell{side: Side::Bottom, pos:2});
+    // }
+
+    #[test]
+    fn avalanche_play_bowl_capture_bottom() {
+        let mut game_state = Box::new(Avalanche{
+            game_board: [4,4,4,4,4,4,0,4,4,4,4,4,4,0],
+            selected_cell: Cell{side: Side::Bottom, pos: 2},
+        });
+        game_state.play();
+        assert_eq!(game_state.game_board, [4,4,0,5,5,5,1,4,4,4,4,4,4,0]);
+        assert_eq!(game_state.selected_cell, Cell{side: Side::Bottom, pos:2});
+    }
+
+    #[test]
+    fn avalanche_play_bowl_capture_top() {
+        let mut game_state = Box::new(Avalanche{
+            game_board: [4,4,4,4,4,4,0,4,4,4,4,4,4,0],
+            selected_cell: Cell{side: Side::Top, pos: 3},
+        });
+        game_state.play();
+        assert_eq!(game_state.game_board, [4,4,4,4,4,4,0,4,4,0,5,5,5,1]);
+        assert_eq!(game_state.selected_cell, Cell{side: Side::Top, pos:3});
+    }
 }

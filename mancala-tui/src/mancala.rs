@@ -188,24 +188,62 @@ pub struct Avalanche{
 
 impl GameState for Avalanche {
     fn play(self: &mut Self) -> () {
+        let chosen_cell: Cell = self.get_selected_cell();
+        let chosen_cell_index = chosen_cell.to_index();
+        let chosen_cell_value: usize = self.game_board[chosen_cell_index];
+        if chosen_cell_value == 0 {
+            return
+        }
+        self.game_board[chosen_cell_index] = 0;
+        
+        // update the board values, skip giving stone to the enemy
+        let mut in_play: bool = true;
+        let mut current_position = chosen_cell_index;
+        let mut value = chosen_cell_value;
+        while in_play {
+            while value != 0 {
+                current_position = (current_position + 1) % BOARD_LEN;
+                if chosen_cell.side == Side::Bottom && current_position == 13 {
+                    continue;
+                }
+                if chosen_cell.side == Side::Top && current_position == 6 {
+                    continue;
+                }
+                self.game_board[current_position] += 1;
+                value -= 1;
+            }
+            let end_cell: Cell = Cell::index_to_cell(current_position);
+            let end_cell_value: usize = self.game_board[current_position];
+            //dbg!(end_cell);
+            //dbg!(end_cell_value);
+            //dbg!(self.game_board);
+            if end_cell.pos == 6{
+                return
+            }
+            if end_cell_value != 1{
+                value = end_cell_value;
+                self.game_board[end_cell.to_index()] = 0;
+            } else {
+                in_play = false;
+            }
+        }
+        self.selected_cell.flip_sides();
+
     }
     
     fn has_won(&self) -> bool{
-        let bottom_done = self.game_board[0..7].into_iter().all(|x| {*x == 0});
-        let top_done = self.game_board[7..14].into_iter().all(|x| {*x == 0});
+        let bottom_done = self.game_board[0..=5].into_iter().all(|x| {*x == 0});
+        let top_done = self.game_board[7..=12].into_iter().all(|x| {*x == 0});
         bottom_done || top_done
     }
 
     fn winner(&self) -> Side{
-        let mut bottom_total: usize = 0;
-        let mut top_total: usize = 0;
-        for p in 0..6{
-            bottom_total += self.game_board[Cell{side: Side::Bottom, pos: p}.to_index()];
-            top_total += self.game_board[Cell{side: Side::Top, pos: p}.to_index()];
+        if self.game_board[6] == self.game_board[13] {
+            return self.selected_cell.side
         }
-        if bottom_total > top_total {
+        if self.game_board[6] > self.game_board[13] {
             Side::Bottom
-        }else{
+        } else {
             Side::Top
         }
     }

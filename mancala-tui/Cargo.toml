@@ -8,8 +8,8 @@ edition = "2021"
 [dependencies]
 cursive = {version = "0.20", default-features = false }
 cursive-aligned-view = "0.6.0"
-cursive_buffered_backend = "0.6.1"
 rand = "0.8.5"
+# cursive_buffered_backend = "0.6.1"
 
 [features]
 default = ["cursive/crossterm-backend"]
