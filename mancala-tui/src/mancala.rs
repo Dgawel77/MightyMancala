@@ -188,49 +188,6 @@ pub struct Avalanche{
 
 impl GameState for Avalanche {
     fn play(self: &mut Self) -> () {
-        let chosen_cell: Cell = self.get_selected_cell();
-        let value: usize = self.game_board[chosen_cell.to_index()];
-        if value == 0 {
-            return
-        }
-        // last index it will land on
-        let end_index: usize = (chosen_cell.to_index() + value) % BOARD_LEN;
-        self.game_board[chosen_cell.to_index()] = 0;
-        // update the board nums
-        for p in 1..=value{
-            self.game_board[(p+chosen_cell.to_index()) % BOARD_LEN] += 1;
-        }
-        
-        let end_cell: Cell = Cell::index_to_cell(end_index);
-        match end_cell{
-            Cell{side: _, pos: 6} => {
-                if (chosen_cell.side != end_cell.side){
-                    self.selected_cell.flip_sides();
-                }
-            },
-            Cell{side: Side::Bottom, pos: _} => {
-                if (chosen_cell.side == end_cell.side){
-                    let opposite_index: usize = Cell{side: Side::Top, pos: end_cell.pos}.to_index();
-                    if (self.game_board[opposite_index] != 0){
-                        self.game_board[6] += self.game_board[opposite_index] + 1;
-                        self.game_board[end_cell.pos] = 0;
-                        self.game_board[opposite_index] = 0;
-                    }
-                }
-                self.selected_cell.flip_sides();
-            },
-            Cell{side: Side::Top, pos: _} => {
-                if (chosen_cell.side == end_cell.side){
-                    let opposite_index: usize = Cell{side: Side::Bottom, pos: end_cell.pos}.to_index();
-                    if (self.game_board[opposite_index] != 0){
-                        self.game_board[13] += self.game_board[opposite_index] + 1;
-                        self.game_board[end_cell.pos] = 0;
-                        self.game_board[opposite_index] = 0;
-                    }
-                }
-                self.selected_cell.flip_sides();
-            },
-        }
     }
     
     fn has_won(&self) -> bool{

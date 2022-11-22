@@ -1,19 +1,17 @@
-use cursive::view::Selector;
-use cursive::{Cursive, CursiveExt};
-use cursive::views::{Button, Dialog, DummyView, EditView,
-                     LinearLayout, SelectView, SliderView, TextView, BoxedView, TextArea, TextContent, CircularFocus};
-use cursive::align::{Align, HAlign};
-use cursive::traits::*;
-use cursive::{view::Nameable};
-use crate::{mancala::{GameMode, Difficulty, Side}, game};
-use std::io::Write;
-use std::str::FromStr;
-use std::error::Error;
+use cursive::{
+    Cursive,
+    CursiveExt,
+    views::{Button, Dialog, DummyView, LinearLayout, SelectView, TextView},
+    view::Nameable,
+    align::Align,
+    traits::Resizable
+};
 use cursive_aligned_view::AlignedView;
+use crate::mancala::{GameMode, Difficulty};
 use crate::board::{MancalaBoard, GameSettings};
 use crate::lib::read_string;
 
-pub fn run() -> Result<(), ()>{
+pub fn run(){
     // backend that does not flicker
     // let backend_init = || -> std::io::Result<Box<dyn cursive::backend::Backend>> {
     //     let backend = cursive::backends::crossterm::Backend::init()?;
@@ -32,11 +30,10 @@ pub fn run() -> Result<(), ()>{
     //siv.add_layer(Dialog::around(board.with_name("board")));
     //siv.try_run_with(backend_init).ok();
     siv.run();
-    Ok(())
 }
 
 fn get_home_page() -> Dialog{
-// =================================================
+    // =================================================
     // Make the Mode selection
     // =================================================
     let mode_closure = |s: &mut Cursive, mode: &GameMode|{
@@ -98,20 +95,12 @@ fn get_home_page() -> Dialog{
 fn play_game(s: &mut Cursive) {
     let settings: &mut GameSettings = s.user_data().unwrap();
     let board: MancalaBoard = MancalaBoard::new(settings, |s: &mut Cursive|{
-        
         s.pop_layer();
         s.add_layer(get_home_page());
     });
     let name = board.get_name();
     s.pop_layer();
-    s.add_layer(
-        Dialog::around(board.with_name("board")).title(name)
-        //.child(Button::new("Quit", |s: &mut Cursive|{
-        //    s.pop_layer();
-        //    s.add_layer(get_home_page());
-        //}))
-    );
-    // s.focus(&Selector::Name("board"));
+    s.add_layer(Dialog::around(board.with_name("board")).title(name));
 }
 
 fn about_window(s: &mut Cursive) -> (){

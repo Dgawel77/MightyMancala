@@ -1,15 +1,12 @@
 use std::fmt::Debug;
-
-use rand::prelude::*;
-use crate::mancala::{GameMode, Difficulty, Side, GameState, Capture, Avalanche, Cell};
+use rand::prelude::Rng;
+use crate::mancala::*;
 use cursive::{
-    event::{Event, EventResult, Key, MouseEvent, Callback},
-    theme::ColorStyle,
+    event::{Event, EventResult, Key, Callback},
     view::View,
     Printer, Vec2, XY,
 };
 use cursive::Cursive;
-
 use crate::lib::read_lines;
 
 #[derive(Debug)]

@@ -8,8 +8,7 @@ fn main(){
 }
 
 pub mod lib{
-    use std::str;
-    use std::fs::{File, read};
+    use std::fs::File;
     use std::io::{self, BufRead, Read};
     use std::path::Path;
 
