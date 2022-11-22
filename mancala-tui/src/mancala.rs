@@ -147,8 +147,8 @@ impl GameState for Capture {
     }
 
     fn winner(&self) -> Option<Side>{
-        let mut bottom_total: usize = 0;
-        let mut top_total: usize = 0;
+        let mut bottom_total: usize = self.game_board[6];
+        let mut top_total: usize = self.game_board[13];
         for p in 0..6{
             bottom_total += self.game_board[Cell{side: Side::Bottom, pos: p}.to_index()];
             top_total += self.game_board[Cell{side: Side::Top, pos: p}.to_index()];
