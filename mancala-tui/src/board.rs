@@ -198,6 +198,7 @@ impl View for MancalaBoard {
                             self.play_state = PlayState::Finish;
                         }
                     },
+                    Event::Key(Key::Esc) => return EventResult::Consumed(Some(self.win_callback.clone())),
                     _ => return EventResult::Ignored
                 }
                 EventResult::Consumed(None)

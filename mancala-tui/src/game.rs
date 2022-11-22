@@ -65,7 +65,7 @@ fn get_home_page() -> Dialog{
     let buttons = LinearLayout::vertical()
         .child(DummyView)
         .child(Button::new("Play", play_game))
-        .child(Button::new("About", about_window));
+        .child(Button::new("Help", help_window));
 
     // =================================================
     // Make the Logo
@@ -104,7 +104,7 @@ fn play_game(s: &mut Cursive) {
     s.add_layer(Dialog::around(board.with_name("board")).title(name));
 }
 
-fn about_window(s: &mut Cursive) -> (){
+fn help_window(s: &mut Cursive) -> (){
     s.pop_layer();
     s.add_layer(
     Dialog::around(
