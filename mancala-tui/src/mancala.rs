@@ -76,7 +76,8 @@ impl Cell {
 
 pub trait GameState{
     fn play(&mut self);
-    // fn has_won(&self) -> bool;
+    fn has_won(&self) -> bool;
+    fn winner(&self) -> Side;
     fn get_selected_cell(&self) -> Cell;
     fn get_value(&self, cell: Cell) -> usize;
     fn move_right(&mut self);
@@ -97,8 +98,6 @@ impl GameState for Capture {
         if chosen_cell_value == 0 {
             return
         }
-        // last index it will land on
-        let end_index: usize = (chosen_cell_index + chosen_cell_value) % BOARD_LEN;
         self.game_board[chosen_cell_index] = 0;
         
         // update the board values, skip giving stone to the enemy
@@ -137,6 +136,26 @@ impl GameState for Capture {
             if end_cell.pos != 6 {
                 self.selected_cell.flip_sides();
             }
+        }
+    }
+
+    fn has_won(&self) -> bool{
+        let bottom_done = self.game_board[0..7].into_iter().all(|x| {*x == 0});
+        let top_done = self.game_board[7..14].into_iter().all(|x| {*x == 0});
+        bottom_done || top_done
+    }
+
+    fn winner(&self) -> Side{
+        let mut bottom_total: usize = 0;
+        let mut top_total: usize = 0;
+        for p in 0..6{
+            bottom_total += self.game_board[Cell{side: Side::Bottom, pos: p}.to_index()];
+            top_total += self.game_board[Cell{side: Side::Top, pos: p}.to_index()];
+        }
+        if bottom_total > top_total {
+            Side::Bottom
+        }else{
+            Side::Top
         }
     }
 
@@ -213,6 +232,26 @@ impl GameState for Avalanche {
         }
     }
     
+    fn has_won(&self) -> bool{
+        let bottom_done = self.game_board[0..7].into_iter().all(|x| {*x == 0});
+        let top_done = self.game_board[7..14].into_iter().all(|x| {*x == 0});
+        bottom_done || top_done
+    }
+
+    fn winner(&self) -> Side{
+        let mut bottom_total: usize = 0;
+        let mut top_total: usize = 0;
+        for p in 0..6{
+            bottom_total += self.game_board[Cell{side: Side::Bottom, pos: p}.to_index()];
+            top_total += self.game_board[Cell{side: Side::Top, pos: p}.to_index()];
+        }
+        if bottom_total > top_total {
+            Side::Bottom
+        }else{
+            Side::Top
+        }
+    }
+
     fn get_value(&self, cell: Cell) -> usize{
         self.game_board[cell.to_index()]
     }
@@ -233,93 +272,3 @@ impl GameState for Avalanche {
         self.selected_cell = cell;
     }
 }
-
-
-// #[derive(Debug)]
-// pub struct GameSettings{
-//     pub mode: GameMode,
-//     pub difficulty: Difficulty
-// }
-
-// #[derive(Debug)]
-// pub struct Mancala{
-//     pub game_state: GameState,
-// }
-
-// holds game data
-// impl Mancala{
-//     pub fn new(settings : GameSettings) -> Self{
-//         Self { 
-//             game_state: 
-//                 match settings.mode {
-//                     GameMode::Capture => {
-//                         Capture::new(settings.difficulty)
-//                     }
-//                     GameMode::Avalanche => {
-//                         Avalanche::new(settings.difficulty)
-//                     }
-//                 }
-//         }
-//     }
-
-//     pub fn play(&mut self){
-//         let chosen = self.get_selected_index() as usize;
-//         let value: usize = self.game_board[chosen] as usize;
-//         self.game_board[chosen] = 0;
-//         for p in 1..=value{
-//             self.game_board[(p+chosen) % BOARD_LEN] += 1;
-//         }
-//         self.flip_sides();
-//     }
-
-//     fn flip_sides(&mut self){
-//         match self.in_play {
-//             Side::Top => self.in_play = Side::Bottom,
-//             Side::Bottom => self.in_play = Side::Top,
-//         }
-//         //self.selected_cell = 0;
-//     }
-
-//     // pub fn get_selected_index(&self) -> u8{
-//     //     match self.in_play{
-//     //         Side::Top => 12 - self.selected_cell,
-//     //         Side::Bottom => self.selected_cell,
-//     //     }
-//     // }
-//     // // gonna have to change this later
-//     // pub fn has_won(&self) -> bool {
-//     //     match self.game_setting.mode{
-//     //         GameMode::Avalanche =>{
-//     //             self.game_board[0..6].into_iter().all(|x| *x == 0) || self.game_board[8..13].into_iter().all(|x| *x == 0)
-//     //         },
-//     //         GameMode::Capture => {
-//     //             self.game_board[0..6].into_iter().all(|x| *x == 0) || self.game_board[8..13].into_iter().all(|x| *x == 0)
-//     //         }
-//     //     }    
-//     // }
-// }
-
-// use std::fmt;
-// impl fmt::Display for Mancala{
-//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-//         // very bad formatting code.
-//         let mut s = String::with_capacity(180);
-//         s.push_str(&format!("{:?}\n  ", self.game_board));
-//         for x in (7..13).rev(){
-//             s.push_str(&format!("|{:2}", x));
-//         }
-//         s.push_str(&format!("\n{:02}|", self.game_board[13]));
-//         for x in (7..13).rev(){
-//             s.push_str(&format!("{:02}|", self.game_board[x]));
-//         }
-//         s.push_str("\n  |");
-//         for x in 0..6{
-//             s.push_str(&format!("{:02}|", self.game_board[x]));
-//         }
-//         s.push_str(&format!("{:02}|\n  ", self.game_board[6]));
-//         for x in 0..6{
-//             s.push_str(&format!("|{} ", x));
-//         }
-//         write!(f, "{}", s)
-//     }
-// }

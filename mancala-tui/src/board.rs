@@ -3,17 +3,17 @@ use std::fmt::Debug;
 use rand::prelude::*;
 use crate::mancala::{GameMode, Difficulty, Side, GameState, Capture, Avalanche, Cell};
 use cursive::{
-    event::{Event, EventResult, Key, MouseEvent},
+    event::{Event, EventResult, Key, MouseEvent, Callback},
     theme::ColorStyle,
     view::View,
     Printer, Vec2, XY,
 };
+use cursive::Cursive;
 
 use crate::lib::read_lines;
 
 #[derive(Debug)]
 pub enum PlayState {
-    Config,
     Playing,
     Finish,
 }
@@ -26,7 +26,9 @@ pub struct GameSettings{
 
 pub struct MancalaBoard {
     game_state: Box<dyn GameState>,
-    play_state: PlayState
+    play_state: PlayState,
+    name: String,
+    win_callback: Callback
 }
 
 const BOARD_LEN: usize = 14;
@@ -34,24 +36,40 @@ const BOARD_POS_X: usize = 0;
 const BOARD_POS_Y: usize = 0;
 // hold the board info  
 impl MancalaBoard {
-    pub fn new(settings: &GameSettings) -> Self{
+
+    // pub fn new<F, S>(label: S, cb: F) -> Self
+    // where
+    //     F: 'static + Fn(&mut Cursive),
+    //     S: Into<String>,
+    // {
+    //     let label = label.into();
+    //     Self::new_raw(format!("<{}>", label), cb)
+    // }
+    pub fn new<F>(settings: &GameSettings, call_back: F) -> Self
+    where 
+        F: 'static + Fn(&mut Cursive),
+    {
         Self {
-            game_state: 
-                match settings.mode {
-                    GameMode::Capture => {
-                        Box::new(Capture{
-                            game_board: MancalaBoard::generate_game_board(settings.difficulty),
-                            selected_cell: Cell{side: Side::Bottom, pos: 0},
-                        })
-                    }
-                    GameMode::Avalanche => {
-                        Box::new(Avalanche{
-                            game_board: MancalaBoard::generate_game_board(settings.difficulty),
-                            selected_cell: Cell{side: Side::Bottom, pos: 0},
-                        })
-                    }
-                },
-            play_state: PlayState::Playing
+            game_state: match settings.mode {
+                GameMode::Capture => {
+                    Box::new(Capture{
+                        game_board: MancalaBoard::generate_game_board(settings.difficulty),
+                        selected_cell: Cell{side: Side::Bottom, pos: 0},
+                    })
+                }
+                GameMode::Avalanche => {
+                    Box::new(Avalanche{
+                        game_board: MancalaBoard::generate_game_board(settings.difficulty),
+                        selected_cell: Cell{side: Side::Bottom, pos: 0},
+                    })
+                }
+            },
+            play_state: PlayState::Playing,
+            name: match settings.mode{
+                GameMode::Capture => "Capture".to_string(),
+                GameMode::Avalanche => "Avalanche".to_string(),
+            },
+            win_callback: Callback::from_fn(call_back)
         }
     }
 
@@ -71,10 +89,6 @@ impl MancalaBoard {
         _game_board[6] = 0;
         _game_board[13] = 0;
         _game_board
-    }
-
-    fn draw_config(&self, printer: &Printer) {
-        printer.print((0, 0), "Press <Enter> to Start!");
     }
 
     fn draw_playing(&self, printer: &Printer) {
@@ -132,13 +146,16 @@ impl MancalaBoard {
         }
     }
 
+    pub fn get_name(&self) -> String{
+        self.name.clone()
+    }
+
 }
 
 // holds how to draw the board on the screen
 impl View for MancalaBoard {
     fn draw(&self, printer: &Printer) {
         match self.play_state {
-            PlayState::Config => self.draw_config(printer),
             PlayState::Playing => self.draw_playing(printer),
             PlayState::Finish => (),
         }
@@ -151,27 +168,32 @@ impl View for MancalaBoard {
 
     fn on_event(&mut self, event: Event) -> EventResult {
         match self.play_state {
-            PlayState::Config => {
-                match event {
-                    Event::Key(Key::Enter) => {
-                        self.play_state = PlayState::Playing;
-                    }
-                    _ => return EventResult::Ignored,
-                }
-                EventResult::Consumed(None)
-            }
+            // PlayState::Config => {
+            //     match event {
+            //         Event::Key(Key::Enter) => {
+            //             self.play_state = PlayState::Playing;
+            //         }
+            //         _ => return EventResult::Ignored,
+            //     }
+            //     EventResult::Consumed(None)
+            // }
             
             PlayState::Playing => {
                 match event {
                     Event::Key(Key::Right) => self.game_state.move_right(),
                     Event::Key(Key::Left) => self.game_state.move_left(),
-                    Event::Char(' ') | Event::Key(Key::Enter) => self.game_state.play(),
+                    Event::Char(' ') | Event::Key(Key::Enter) => {
+                        self.game_state.play();
+                        if self.game_state.has_won(){
+                            self.play_state = PlayState::Finish;
+                        }
+                    },
                     _ => return EventResult::Ignored
                 }
                 EventResult::Consumed(None)
             }
-            
-            PlayState::Finish => EventResult::Ignored,
+            // no clue how the call back works it just works
+            PlayState::Finish => return EventResult::Consumed(Some(self.win_callback.clone())),
         }
     }
 }

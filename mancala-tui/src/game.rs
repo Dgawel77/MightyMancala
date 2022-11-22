@@ -5,7 +5,7 @@ use cursive::views::{Button, Dialog, DummyView, EditView,
 use cursive::align::{Align, HAlign};
 use cursive::traits::*;
 use cursive::{view::Nameable};
-use crate::{mancala::{GameMode, Difficulty}, game};
+use crate::{mancala::{GameMode, Difficulty, Side}, game};
 use std::io::Write;
 use std::str::FromStr;
 use std::error::Error;
@@ -97,12 +97,15 @@ fn get_home_page() -> Dialog{
 
 fn play_game(s: &mut Cursive) {
     let settings: &mut GameSettings = s.user_data().unwrap();
-    let board: MancalaBoard = MancalaBoard::new(settings);
+    let board: MancalaBoard = MancalaBoard::new(settings, |s: &mut Cursive|{
+        
+        s.pop_layer();
+        s.add_layer(get_home_page());
+    });
+    let name = board.get_name();
     s.pop_layer();
     s.add_layer(
-        Dialog::around(board.with_name("board"))
-        .fixed_height(20)
-        .fixed_width(50)
+        Dialog::around(board.with_name("board")).title(name)
         //.child(Button::new("Quit", |s: &mut Cursive|{
         //    s.pop_layer();
         //    s.add_layer(get_home_page());
