@@ -3,6 +3,7 @@ use rand::prelude::Rng;
 use crate::mancala::*;
 use cursive::{
     event::{Event, EventResult, Key, Callback},
+    theme::ColorStyle,
     view::View,
     Printer, Vec2, XY,
 };
@@ -103,17 +104,23 @@ impl MancalaBoard {
     fn draw_selected_cell(&self, printer: &Printer){
         let selected_cell: Cell = self.game_state.get_selected_cell();
         let (x, y) = MancalaBoard::cell_to_xy(selected_cell);
-        printer.print((x, y), "╭╌╌╌╮");
-        printer.print((x, y+1), "╎   ╎");
-        printer.print((x, y+2), "╰╌╌╌╯");
+        printer.with_color(ColorStyle::title_primary(), |printer| {
+            printer.print((x, y), "╭╌╌╌╮");
+            printer.print((x, y+1), "╎   ╎");
+            printer.print((x, y+2), "╰╌╌╌╯");
+        });
     }
     
     fn draw_arrow(&self, printer: &Printer){
         let selected_cell: Cell = self.game_state.get_selected_cell();
         let (x, _) = MancalaBoard::cell_to_xy(selected_cell);
         match selected_cell {
-            Cell{side: Side::Top, pos: _} => printer.print((x + 2, 4), "↑"),
-            Cell{side: Side::Bottom, pos: _} => printer.print((x + 2, 4), "↓"),
+            Cell{side: Side::Top, pos: _} => printer.with_color(ColorStyle::title_primary(), |printer| {
+                printer.print((x + 2, 4), "↑")
+            }),
+            Cell{side: Side::Bottom, pos: _} => printer.with_color(ColorStyle::title_primary(), |printer| {
+                printer.print((x + 2, 4), "↓")
+            }),
         }
     }
     

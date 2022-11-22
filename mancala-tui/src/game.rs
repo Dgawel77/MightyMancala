@@ -63,6 +63,7 @@ fn get_home_page() -> Dialog{
     // Make the Buttons
     // =================================================
     let buttons = LinearLayout::vertical()
+        .child(DummyView)
         .child(Button::new("Play", play_game))
         .child(Button::new("About", about_window));
 
