@@ -34,17 +34,9 @@ pub struct MancalaBoard {
 const BOARD_LEN: usize = 14;
 const BOARD_POS_X: usize = 0;
 const BOARD_POS_Y: usize = 0;
+
 // hold the board info  
 impl MancalaBoard {
-
-    // pub fn new<F, S>(label: S, cb: F) -> Self
-    // where
-    //     F: 'static + Fn(&mut Cursive),
-    //     S: Into<String>,
-    // {
-    //     let label = label.into();
-    //     Self::new_raw(format!("<{}>", label), cb)
-    // }
     pub fn new<F>(settings: &GameSettings, call_back: F) -> Self
     where 
         F: 'static + Fn(&mut Cursive),
@@ -99,6 +91,7 @@ impl MancalaBoard {
         self.draw_values(&offset);
     }
 
+    
     fn draw_values(&self, printer: &Printer){
         for side in [Side::Top, Side::Bottom]{
             for pos in 0..=6{
@@ -108,7 +101,7 @@ impl MancalaBoard {
             }
         }
     }
-
+    
     fn draw_selected_cell(&self, printer: &Printer){
         let selected_cell: Cell = self.game_state.get_selected_cell();
         let (x, y) = MancalaBoard::cell_to_xy(selected_cell);
@@ -116,7 +109,7 @@ impl MancalaBoard {
         printer.print((x, y+1), "╎   ╎");
         printer.print((x, y+2), "╰╌╌╌╯");
     }
-
+    
     fn draw_arrow(&self, printer: &Printer){
         let selected_cell: Cell = self.game_state.get_selected_cell();
         let (x, _) = MancalaBoard::cell_to_xy(selected_cell);
@@ -125,7 +118,7 @@ impl MancalaBoard {
             Cell{side: Side::Bottom, pos: _} => printer.print((x + 2, 4), "↓"),
         }
     }
-
+    
     fn draw_base_layer(&self, printer: &Printer){
         if let Ok(lines) = read_lines("assets/boardSchematic.txt"){
             for (position, line) in lines.enumerate(){
@@ -136,6 +129,29 @@ impl MancalaBoard {
         }
     }
 
+    fn draw_win(&self, printer: &Printer) {
+        let offset: Printer = printer.offset(XY{x:BOARD_POS_X, y:BOARD_POS_Y});
+        self.draw_congrats(&offset);
+        self.draw_who_won(&offset);
+    }
+
+    fn draw_congrats(&self, printer: &Printer){
+        if let Ok(lines) = read_lines("assets/congrats.txt"){
+            for (position, line) in lines.enumerate(){
+                if let Ok(ip) = line{
+                    printer.print((0, position), &ip);
+                }
+            }
+        }
+    }
+
+    fn draw_who_won(&self, printer: &Printer){
+        match self.game_state.winner(){
+            Side::Bottom => printer.print((14, 6), "Bottom Player has won!"),
+            Side::Top => printer.print((16, 6), "Top Player has won!"),
+        }
+    }
+    
     fn cell_to_xy(cell: Cell) -> (usize, usize){
         // bunch of magic to make the formating work with my data scheme
         match cell {
@@ -157,27 +173,16 @@ impl View for MancalaBoard {
     fn draw(&self, printer: &Printer) {
         match self.play_state {
             PlayState::Playing => self.draw_playing(printer),
-            PlayState::Finish => (),
+            PlayState::Finish => self.draw_win(printer),
         }
     }
 
     fn required_size(&mut self, _: Vec2) -> Vec2 {
-        //  Vec2::new(19, 19)
         Vec2::new(48, 9)
     }
 
     fn on_event(&mut self, event: Event) -> EventResult {
         match self.play_state {
-            // PlayState::Config => {
-            //     match event {
-            //         Event::Key(Key::Enter) => {
-            //             self.play_state = PlayState::Playing;
-            //         }
-            //         _ => return EventResult::Ignored,
-            //     }
-            //     EventResult::Consumed(None)
-            // }
-            
             PlayState::Playing => {
                 match event {
                     Event::Key(Key::Right) => self.game_state.move_right(),
@@ -193,7 +198,11 @@ impl View for MancalaBoard {
                 EventResult::Consumed(None)
             }
             // no clue how the call back works it just works
-            PlayState::Finish => return EventResult::Consumed(Some(self.win_callback.clone())),
+            PlayState::Finish => {
+                match event {
+                    _ => return EventResult::Consumed(Some(self.win_callback.clone()))
+                }
+            }
         }
     }
 }

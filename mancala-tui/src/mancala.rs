@@ -132,6 +132,7 @@ impl GameState for Capture {
                 Side::Top => self.game_board[13] += captured_stones,
                 Side::Bottom => self.game_board[6] += captured_stones,
             }
+            self.selected_cell.flip_sides();
         }else{
             if end_cell.pos != 6 {
                 self.selected_cell.flip_sides();
@@ -140,8 +141,8 @@ impl GameState for Capture {
     }
 
     fn has_won(&self) -> bool{
-        let bottom_done = self.game_board[0..7].into_iter().all(|x| {*x == 0});
-        let top_done = self.game_board[7..14].into_iter().all(|x| {*x == 0});
+        let bottom_done = self.game_board[0..=5].into_iter().all(|x| {*x == 0});
+        let top_done = self.game_board[7..=12].into_iter().all(|x| {*x == 0});
         bottom_done || top_done
     }
 

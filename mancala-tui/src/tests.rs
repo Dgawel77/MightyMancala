@@ -65,7 +65,7 @@ mod capture_tests{
         });
         game_state.play();
         assert_eq!(game_state.game_board, [4,4,4,0,0,4,5,4,0,4,4,4,4,0]);
-        assert_eq!(game_state.selected_cell, Cell{side: Side::Bottom, pos:3});
+        assert_eq!(game_state.selected_cell, Cell{side: Side::Top, pos:3});
     }
 
     #[test]
@@ -76,7 +76,7 @@ mod capture_tests{
         });
         game_state.play();
         assert_eq!(game_state.game_board, [4,4,4,0,4,4,0,4,0,0,4,4,4,5]);
-        assert_eq!(game_state.selected_cell, Cell{side: Side::Top, pos:4});
+        assert_eq!(game_state.selected_cell, Cell{side: Side::Bottom, pos:4});
     }
 
     #[test]
@@ -87,7 +87,7 @@ mod capture_tests{
         });
         game_state.play();
         assert_eq!(game_state.game_board, [4,4,4,0,0,4,1,4,0,4,4,4,4,0]);
-        assert_eq!(game_state.selected_cell, Cell{side: Side::Bottom, pos:3});
+        assert_eq!(game_state.selected_cell, Cell{side: Side::Top, pos:3});
     }
 
     #[test]
@@ -98,7 +98,7 @@ mod capture_tests{
         });
         game_state.play();
         assert_eq!(game_state.game_board, [4,4,4,0,4,4,0,4,0,0,4,4,4,1]);
-        assert_eq!(game_state.selected_cell, Cell{side: Side::Top, pos:4});
+        assert_eq!(game_state.selected_cell, Cell{side: Side::Bottom, pos:4});
     }
 
     #[test]
