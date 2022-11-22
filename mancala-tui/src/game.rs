@@ -1,7 +1,7 @@
 use cursive::{
     Cursive,
     CursiveExt,
-    views::{Button, Dialog, DummyView, LinearLayout, SelectView, TextView},
+    views::{Button, Dialog, DummyView, LinearLayout, SelectView, TextView, ScrollView},
     view::Nameable,
     align::Align,
     traits::Resizable
@@ -107,10 +107,13 @@ fn play_game(s: &mut Cursive) {
 fn about_window(s: &mut Cursive) -> (){
     s.pop_layer();
     s.add_layer(
-        Dialog::around(TextView::new(read_string("assets/help_page.txt")))
-        .button("Quit", |s: &mut Cursive|{
-            s.pop_layer();
-            s.add_layer(get_home_page());
-        })
-    );
+    Dialog::around(
+        ScrollView::new(
+            TextView::new(read_string("assets/help_page.txt"))
+        )
+    )
+    .button("Quit", |s: &mut Cursive|{
+        s.pop_layer();
+        s.add_layer(get_home_page());
+    }));
 }

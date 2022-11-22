@@ -1,6 +1,44 @@
+How to play:
+    Mancala is a two player strategy game. 
+    
+    There are 2 rows of 6 bowls with a "store" on each side.
+    
+    Each player takes turns picking a bowl and moving stones 
+    counter clockwise, depositing one stone in each bowl until 
+    all stones are gone. Stones put into your own store are 
+    kept, and your opponents store is skipped.
+    
+    The player with the most stones in their store wins.
+
 Modes:
-    Capture: 
-    Avalanche:
+    Capture: The classic way of playing mancala. 
+            After you finish your move, if the final stone 
+            lands on your side in an empty bowl take that 
+            piece and the pices on the opposite side and
+            put them in your own store.
+
+            If the final stone lands in your store you get
+            a free move.
+
+            If one side is empty the game ends. If the other 
+            side still has pieces that side captures them, and
+            puts them in their store.
+            
+            The side with the most pieces wins. 
+    
+    Avalanche: A modified version of mancala.
+            After you finish your move if the final piece lands
+            in a bowl that is not empty move those pieces. 
+            Repeat until the final piece lands in a store or an 
+            empty bowl. 
+            
+            If it lands in a store you get a free move. If it 
+            lands in an empty bowl end your turn.
+
+            If one side is empty the game ends. 
+            
+            The side with the most pieces in their store at the 
+            end wins.
 
 Difficulty:
     Normal: Every bowl gets 4 stones.
