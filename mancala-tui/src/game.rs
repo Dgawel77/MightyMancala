@@ -9,7 +9,6 @@ use cursive::{
 use cursive_aligned_view::AlignedView;
 use crate::mancala::{GameMode, Difficulty};
 use crate::board::{MancalaBoard, GameSettings};
-use crate::lib::read_string;
 
 pub fn run(){
     // backend that does not flicker
@@ -70,7 +69,7 @@ fn get_home_page() -> Dialog{
     // =================================================
     // Make the Logo
     // =================================================
-    let logo = TextView::new(read_string("assets/logo.txt"));
+    let logo = TextView::new(String::from_utf8_lossy(include_bytes!("../assets/logo.txt")));
     
     // =================================================
     // Make the Homepage
@@ -109,7 +108,7 @@ fn help_window(s: &mut Cursive) -> (){
     s.add_layer(
     Dialog::around(
         ScrollView::new(
-            TextView::new(read_string("assets/help_page.txt"))
+            TextView::new(String::from_utf8_lossy(include_bytes!("../assets/help_page.txt")))
         )
     )
     .button("Quit", |s: &mut Cursive|{

@@ -8,7 +8,6 @@ use cursive::{
     Printer, Vec2, XY,
 };
 use cursive::Cursive;
-use crate::lib::read_lines;
 
 #[derive(Debug)]
 pub enum PlayState {
@@ -124,12 +123,9 @@ impl MancalaBoard {
     }
     
     fn draw_base_layer(&self, printer: &Printer){
-        if let Ok(lines) = read_lines("assets/boardSchematic.txt"){
-            for (position, line) in lines.enumerate(){
-                if let Ok(ip) = line{
-                    printer.print((0, position), &ip);
-                }
-            }
+        let base_layer = String::from_utf8_lossy(include_bytes!("../assets/boardSchematic.txt"));
+        for (position, line) in base_layer.lines().enumerate(){
+            printer.print((0, position), &line);
         }
     }
 
@@ -140,12 +136,9 @@ impl MancalaBoard {
     }
 
     fn draw_congrats(&self, printer: &Printer){
-        if let Ok(lines) = read_lines("assets/congrats.txt"){
-            for (position, line) in lines.enumerate(){
-                if let Ok(ip) = line{
-                    printer.print((0, position), &ip);
-                }
-            }
+        let congrats = String::from_utf8_lossy(include_bytes!("../assets/congrats.txt"));
+        for (position, line) in congrats.lines().enumerate(){
+            printer.print((0, position), &line);
         }
     }
 
