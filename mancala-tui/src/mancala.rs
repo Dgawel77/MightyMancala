@@ -76,8 +76,8 @@ impl Cell {
 
 pub trait GameState{
     fn play(&mut self);
-    fn has_won(&self) -> bool;
-    fn winner(&self) -> Side;
+    fn has_ended(&self) -> bool;
+    fn winner(&self) -> Option<Side>;
     fn get_selected_cell(&self) -> Cell;
     fn get_value(&self, cell: Cell) -> usize;
     fn move_right(&mut self);
@@ -140,13 +140,13 @@ impl GameState for Capture {
         }
     }
 
-    fn has_won(&self) -> bool{
+    fn has_ended(&self) -> bool{
         let bottom_done = self.game_board[0..=5].into_iter().all(|x| {*x == 0});
         let top_done = self.game_board[7..=12].into_iter().all(|x| {*x == 0});
         bottom_done || top_done
     }
 
-    fn winner(&self) -> Side{
+    fn winner(&self) -> Option<Side>{
         let mut bottom_total: usize = 0;
         let mut top_total: usize = 0;
         for p in 0..6{
@@ -154,9 +154,14 @@ impl GameState for Capture {
             top_total += self.game_board[Cell{side: Side::Top, pos: p}.to_index()];
         }
         if bottom_total > top_total {
-            Side::Bottom
+            //bottom wins
+            Some(Side::Bottom)
+        }else if bottom_total < top_total{
+            //top wins
+            Some(Side::Top)
         }else{
-            Side::Top
+            //draw
+            None
         }
     }
 
@@ -231,20 +236,22 @@ impl GameState for Avalanche {
 
     }
     
-    fn has_won(&self) -> bool{
+    fn has_ended(&self) -> bool{
         let bottom_done = self.game_board[0..=5].into_iter().all(|x| {*x == 0});
         let top_done = self.game_board[7..=12].into_iter().all(|x| {*x == 0});
         bottom_done || top_done
     }
 
-    fn winner(&self) -> Side{
-        if self.game_board[6] == self.game_board[13] {
-            return self.selected_cell.side
-        }
+    fn winner(&self) -> Option<Side>{
         if self.game_board[6] > self.game_board[13] {
-            Side::Bottom
-        } else {
-            Side::Top
+            //bottom wins
+            Some(Side::Bottom)
+        }else if self.game_board[6] < self.game_board[13]{
+            //top wins
+            Some(Side::Top)
+        }else{
+            //draw
+            None
         }
     }
 

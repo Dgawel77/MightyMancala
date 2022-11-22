@@ -151,8 +151,9 @@ impl MancalaBoard {
 
     fn draw_who_won(&self, printer: &Printer){
         match self.game_state.winner(){
-            Side::Bottom => printer.print((14, 6), "Bottom Player has won!"),
-            Side::Top => printer.print((16, 6), "Top Player has won!"),
+            Some(Side::Bottom) => printer.print((14, 6), "Bottom Player has won!"),
+            Some(Side::Top) => printer.print((16, 6), "Top Player has won!"),
+            None => printer.print((10, 6), "The match has ended in a draw!"),
         }
     }
     
@@ -193,7 +194,7 @@ impl View for MancalaBoard {
                     Event::Key(Key::Left) => self.game_state.move_left(),
                     Event::Char(' ') | Event::Key(Key::Enter) => {
                         self.game_state.play();
-                        if self.game_state.has_won(){
+                        if self.game_state.has_ended(){
                             self.play_state = PlayState::Finish;
                         }
                     },
