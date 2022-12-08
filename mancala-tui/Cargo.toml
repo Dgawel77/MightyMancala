@@ -1,0 +1,24 @@
+[package]
+name = "mighty-mancala"
+version = "0.1.1"
+edition = "2021"
+authors = ["David Gawel <dgawel77@gmail.com>"]
+description = "A Text User Interface Mancala Game"
+readme = "README.md"
+license = "MIT"
+keywords = ["tui", "mancala", "gamedev", "game"]
+categories = ["games", "command-line-utilities"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cursive = {version = "0.20", default-features = false }
+cursive-aligned-view = "0.6.0"
+rand = "0.8.5"
+
+[features]
+default = ["cursive/crossterm-backend"]
+
+[[bin]]
+name = "mancala"
+path = "src/main.rs"
