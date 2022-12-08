@@ -5,7 +5,7 @@ Mighty mancala is the best two player mancala gaming experience, ran on the comm
 The Demo can be watched [here](https://youtu.be/tgR5kKDAFYU).
 
 Play with a friend and see who is the best at mancala
-![home page](images/homepage.png)
+![home page](https://github.com/Dgawel77/MightyMancala/blob/main/mancala-tui/images/homepage.png)
 
 ## Install
 `cargo install mighty-mancala`
@@ -23,7 +23,7 @@ To quit the program press `q`.
 
 ## Features
 Mighty mancala has an easy to use text user interface. 
-![game play page](images/gameplay.png)
+![game play page](https://github.com/Dgawel77/MightyMancala/blob/main/mancala-tui/images/gameplay.png)
 
 It also has multiple game modes to play with 
 - Capture
