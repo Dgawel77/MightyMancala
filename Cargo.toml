@@ -1,9 +1,10 @@
 [package]
 name = "mighty-mancala"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["David Gawel <dgawel77@gmail.com>"]
 description = "A Text User Interface Mancala Game"
+repository = "https://github.com/Dgawel77/MightyMancala"
 readme = "README.md"
 license = "MIT"
 keywords = ["tui", "mancala", "gamedev", "game"]
