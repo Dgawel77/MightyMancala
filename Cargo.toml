@@ -1,6 +1,6 @@
 [package]
 name = "mighty-mancala"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 authors = ["David Gawel <dgawel77@gmail.com>"]
 description = "A Text User Interface Mancala Game"
